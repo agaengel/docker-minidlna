@@ -1,18 +1,13 @@
 #!/bin/bash
 
-#set -e
-
-# > /etc/minidlna.conf
-
 for VAR in `env`; do
     if [[ $VAR =~ ^MINIDLNA_ ]]; then
-        minidlna_name=`echo "$VAR" | sed -r "s/MINIDLNA_(.*)=.*/\1/g" | tr '[:upper:]' '[:lower:]'`
-        minidlna_value=`echo "$VAR" | sed -r "s/.*=(.*)/\1/g"`
-	echo ${minidlna_name}
-	sed -i -e "s/$minidlna_name=.*/$minidlna_name=$minidlna_value/g" /etc/minidlna.conf
-	echo sed -i -e "s/$minidlna_name=.*/$minidlna_name=$minidlna_value/g" etc/minidlna.conf
-        #echo "${minidlna_name}=${minidlna_value}" >> /etc/minidlna.conf
+	KEY=`echo ${VAR:9} | tr '[:upper:]' '[:lower:]' | cut -d "=" -f 1`
+	VALUE=`echo ${VAR:9} | tr '[:upper:]' '[:lower:]' | cut -d "=" -f 2`
+	echo sed -i -e "s|^.*$KEY=.*$|$KEY=$VALUE|g" /etc/minidlna.conf
+	sed -i -e "s|^.*$KEY=.*$|$KEY=$VALUE|g" /etc/minidlna.conf
     fi
 done
 
-#exec bash
+/usr/sbin/minidlnad -S 
+
